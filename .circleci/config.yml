@@ -1,0 +1,39 @@
+version: 2.1
+orbs:
+  utils: arrai/utils@1.3.1
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - utils/add_ssh_config
+      - run: npm install
+      - run:
+          name: js lint
+          command: git diff --name-only --diff-filter=ACMR origin/dev..origin/${CIRCLE_BRANCH} -- '*.js' | xargs -r npx eslint
+      - utils/make_status_shield:
+          when: on_fail
+          status: errors
+          color: red
+          logo: eslint
+      - run:
+          name: Check if we had any warnings
+          when: always
+          command: test ! -s ~/lint
+      - utils/make_status_shield:
+          when: always
+          status: warnings
+          color: orange
+          logo: eslint
+          preserve: true
+      - utils/make_status_shield:
+          when: on_success
+          status: passed
+          color: brightgreen
+          logo: eslint
+      - utils/rsync_file:
+          when: always
+          file: ~/status.svg
+          remote_file: $CIRCLE_BRANCH.$CIRCLE_JOB.svg
+          host: docs

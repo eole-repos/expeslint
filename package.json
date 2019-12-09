@@ -1,0 +1,10 @@
+{
+  "name": "expeslint",
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "npx eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2"
+  }
+}
